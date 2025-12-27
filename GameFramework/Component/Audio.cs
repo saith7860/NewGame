@@ -30,60 +30,61 @@ namespace GameFramework.Component
         }
         public void PlaySound(string name)
         {
-            if (outputs.ContainsKey(name))
-            {
-                Stop(name);
-            }
             if (!sounds.ContainsKey(name))
                 return;
-            if (sounds.ContainsKey(name))
-            {
-              var sound = sounds[name];
-              string fullPath = System.IO.Path.Combine(
-              AppDomain.CurrentDomain.BaseDirectory,
-              sound.FilePath
-          );
 
-                var reader = new AudioFileReader(fullPath);
-                reader.Volume = sound.Volume;
-                readers[name] = reader;
-                var output = new WaveOutEvent();
-                output.Init(reader);
+            // stop if already playing
+            //if (outputs.ContainsKey(name))
+            //{
+            //    Stop(name);
+            //}
+
+            AudioTrack sound = sounds[name];
+
+            string fullPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                sound.FilePath
+            );
+            if (!File.Exists(fullPath))
+                throw new FileNotFoundException(fullPath);
+            AudioFileReader reader = new AudioFileReader(fullPath);
+            reader.Volume = sound.Volume;
+
+            WaveOutEvent output = new WaveOutEvent();
+            output.Init(reader);
+
+            if (sound.Loop)
+            {
                 output.PlaybackStopped += (s, e) =>
                 {
-                    if (!sound.Loop)
-                    {
-                        output.Dispose();
-                        reader.Dispose();
-                        outputs.Remove(name);
-                        readers.Remove(name);
-                    }
-                    else
-                    {
-                        reader.Position = 0;
-                        output.Play();
-                    }
+                    reader.Position = 0;
+                    output.Play();
                 };
-                outputs[name] = output;
-                output.Play();
             }
-            else
-            {
-                throw new Exception($"Sound {name} not found.");
-            }
+
+            readers[name] = reader;
+            outputs[name] = output;
+
+            output.Play();
         }
         public void Stop(string name)
         {
-            if(outputs.ContainsKey(name))
-            {
-                outputs[name].Stop();
-            }
+            if (!outputs.ContainsKey(name))
+                return;
+
+            outputs[name].Stop();
+            outputs[name].Dispose();
+            readers[name].Dispose();
+
+            outputs.Remove(name);
+            readers.Remove(name);
         }
+
         public void StopAll()
         {
-            foreach(var output in outputs.Values)
+            foreach (var name in outputs.Keys.ToList())
             {
-                output.Stop();
+                Stop(name);
             }
         }
         public void SetVolume(string name, float volume)

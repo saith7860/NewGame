@@ -19,7 +19,7 @@ namespace GameFramework.Core
             FilePath = filePath;
             Volume = 1f;
             Loop = loop;
-            Duration = 0f;
+            Duration = 1f;
         }
     }
 }
