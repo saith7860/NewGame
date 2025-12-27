@@ -18,7 +18,7 @@ namespace GameFrameWork
         {
             if (other is Player player)
             {
-                player.Health += 20;
+                player.Lives ++;
                 IsActive = false;
             }
         }

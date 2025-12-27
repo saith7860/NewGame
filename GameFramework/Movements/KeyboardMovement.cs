@@ -18,7 +18,8 @@ namespace GameFrameWork
         public void Move(GameObject obj, GameTime gameTime)
         {
             if (Keyboard.IsKeyPressed(Key.LeftArrow))
-                obj.Position = new PointF(obj.Position.X - Speed, obj.Position.Y);
+           
+            obj.Position = new PointF(obj.Position.X - Speed, obj.Position.Y);
 
             if (Keyboard.IsKeyPressed(Key.RightArrow))
                 obj.Position = new PointF(obj.Position.X + Speed, obj.Position.Y);

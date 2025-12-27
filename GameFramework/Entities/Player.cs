@@ -3,12 +3,19 @@ namespace GameFrameWork
 {
     public class Player : GameObject
     {
+        public Player(Image Sprite,PointF startPos,float speed)
+        {
+            this.Sprite = Sprite;
+            this.Position = startPos;
+            this.Movement=new KeyboardMovement(speed);
+            this.Size=new SizeF(Sprite.Width,Sprite.Height);
+        }
         // Movement strategy: demonstrates composition over inheritance.
         // Different movement behaviors can be injected (KeyboardMovement, PatrolMovement, etc.).
         public IMovement? Movement { get; set; }
 
         // Domain state
-        public int Health { get; set; } = 100;
+        public int Lives { get; set; } = 3;
         public int Score { get; set; } = 0;
 
         /// Update the player: delegate movement to the Movement strategy (if provided) and then apply base update.
@@ -30,10 +37,22 @@ namespace GameFrameWork
         public override void OnCollision(GameObject other)
         {
             if (other is Enemy)
-                Health -= 10;
+            { 
+                Lives --;
+                ResetPosition();
+                if (Lives<=0)
+                {
+                   //gameOver logic 
+                }
+            }
+
 
             if (other is PowerUp)
-                Health += 20;
+                Lives ++;
+        }
+        public void ResetPosition()
+        {
+            this.Position=new PointF(0,0);
         }
     }
 
