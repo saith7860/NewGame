@@ -1,18 +1,29 @@
 ﻿using GameFramework.Component;
 using GameFramework.Core;
+using EZInput;
+using GameFramework.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using GameFramework.Movements;
 using GameFrameWork;
 using GameFramework.Environment;
 using GameFramework.Environment.Behaviours;
 using NAudio.Wave;
 using System.Windows.Forms;
+//using DocumentFormat.OpenXml.Office2021.Excel.RichDataWebImage;
 namespace spaceShooter
 {
+
+
     public partial class SpaceShooter : Form
     {
        List<GameObject> gameObjects = new List<GameObject>();
         Audio audio;
+        private JumpingMovement jumpMovement;
+        private HorizantalMovement horizantalMovement;
         //GameObject player;
-        //GameObject bird;
+        GameObject bird;
         //Animator birdAnimator;
         //SpriteAnimationTrack birdFlyTrack;
 
@@ -21,9 +32,6 @@ namespace spaceShooter
         public SpaceShooter()
         {
             InitializeComponent();
-
-
-
             this.DoubleBuffered = true;
 
             // 🐦 Create bird object
@@ -49,24 +57,32 @@ namespace spaceShooter
 
             //// ▶ Play animation
             //birdAnimator.PlayAnimation(birdFlyTrack);
-
+            jumpMovement=new JumpingMovement(
+                700f,
+                1800f,
+                 200f
+                );
+            horizantalMovement = new HorizantalMovement(100, 800, 2);
             // ⏱ Game Timer
             gameTimer = new System.Windows.Forms.Timer();
             gameTimer.Interval = 16;
             gameTimer.Start();
+            gameTimer.Tick += TimerEvent_Tick;
 
         }
+      
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            var tree = new EnvironmentObject(
-           "Tree",
-           new SolidBehavious(),
-           new PointF(150, 200),
-           new SizeF(60, 80),
-           Properties.Resources.flyingBird
-       );
-            var orange = new EnvironmentObject(
+
+            //     var tree = new EnvironmentObject(
+            //    "Tree",
+            //    new SolidBehavious(),
+            //    new PointF(400, 200),
+            //    new SizeF(200, 200),
+            //    Properties.Resources.tree
+            //);
+            bird = new EnvironmentObject(
                 "orange",
                             new SolidBehavious(),
                             new PointF(300, 200),
@@ -75,8 +91,18 @@ namespace spaceShooter
 
 
                 );
-            gameObjects.Add(orange);
-            gameObjects.Add(tree);
+        
+            gameObjects.Add(bird);
+            bird.AddMovement(horizantalMovement);
+            bird.AddMovement(jumpMovement);
+
+            // Replace this line:
+            // if (EZInput.IsKeyPressed(Key.Space))
+
+            // With this, assuming EZInput provides a static class Input with IsKeyPressed method:
+            
+            //jumpMovement.Jump();
+            //gameObjects.Add(tree);
 
 
             //audio.AddSound(new AudioTrack
@@ -100,8 +126,29 @@ namespace spaceShooter
 
         private void TimerEvent_Tick(object sender, EventArgs e)
         {
-            //bird.Update(null);
+
+            
             //birdAnimator.Update(deltaTime);
+
+            GameTime gameTime = new GameTime(deltaTime);
+            //EZInput.Keyboard.Update();
+            if (EZInput.Keyboard.IsKeyPressed(Key.Space))
+            {
+                jumpMovement.Jump();
+             
+            }
+            // Your deltaTime is 0.016f (~60FPS)
+            bird.Update(gameTime);
+            foreach (var obj in gameObjects)
+            {
+                if (obj.Movements.Count!=0)
+                {
+                    obj.ApplyMovements(gameTime);
+                }
+
+               
+
+            }
             Invalidate();
         }
         //protected override void OnPaint(PaintEventArgs e)
@@ -131,6 +178,7 @@ namespace spaceShooter
 
         private void button1_Click(object sender, EventArgs e)
         {
+            
             audio = new Audio();
             //var newAudio=new AudioTrack("bg", "Assets/backgroundMusic.mp3", false);
             audio.AddSound(
@@ -140,7 +188,6 @@ namespace spaceShooter
            false
        )
    );
-
             audio.PlaySound("bg");
 
         }

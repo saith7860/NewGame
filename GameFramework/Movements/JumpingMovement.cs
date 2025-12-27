@@ -9,7 +9,7 @@ using System.Drawing;
 
 namespace GameFramework.Movements
 {
-    internal class JumpingMovement : IMovement
+    public class JumpingMovement : IMovement
     {
 
         private float jumpForce;
@@ -23,6 +23,7 @@ namespace GameFramework.Movements
             this.jumpForce = jumpForce;
             this.gravity = gravity;
             this.groundY = groundY;
+            
         }
 
         public void Jump()

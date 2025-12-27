@@ -53,8 +53,9 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(1234, 733);
             Controls.Add(button1);
+            DoubleBuffered = true;
             Name = "SpaceShooter";
             Text = "Form1";
             Load += Form1_Load;

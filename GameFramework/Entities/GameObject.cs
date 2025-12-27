@@ -4,6 +4,7 @@ using GameFramework.Movements;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 
 namespace GameFrameWork
 {
@@ -12,6 +13,21 @@ namespace GameFrameWork
         // Position of the object in the game world (encapsulated state)
         public PointF Position { get; set; }
         public IAudio? AudioComponent { get; set; } = null;
+
+        public List<IMovement> Movements { get; } = new List<IMovement>();
+
+        public void AddMovement(IMovement movement)
+        {
+            Movements.Add(movement);
+        }
+        public void ApplyMovements(GameTime gameTime)
+        {
+            foreach (var movement in Movements)
+            {
+                movement.Move(this, gameTime);
+            }
+        }
+
 
         // Size of the object (width and height)
         // Used to compute the bounding box for collision detection (single responsibility: size responsibility)
