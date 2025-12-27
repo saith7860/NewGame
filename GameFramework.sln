@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFramework", "GameFramework\GameFramework.csproj", "{ADC42D27-C310-4C10-8927-1CFAF8BAB4C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spaceShooter", "spaceShooter\spaceShooter.csproj", "{581CC132-9E86-427C-A59F-5857F1DEDCDB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ADC42D27-C310-4C10-8927-1CFAF8BAB4C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADC42D27-C310-4C10-8927-1CFAF8BAB4C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADC42D27-C310-4C10-8927-1CFAF8BAB4C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADC42D27-C310-4C10-8927-1CFAF8BAB4C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{581CC132-9E86-427C-A59F-5857F1DEDCDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{581CC132-9E86-427C-A59F-5857F1DEDCDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{581CC132-9E86-427C-A59F-5857F1DEDCDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{581CC132-9E86-427C-A59F-5857F1DEDCDB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E6947CFA-58B3-44A9-AC7C-F036126FA74A}
+	EndGlobalSection
+EndGlobal

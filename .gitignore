@@ -1,0 +1,24 @@
+# Build folders
+bin/
+obj/
+Debug/
+Release/
+
+# Visual Studio
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+
+# NuGet
+*.nupkg
+packages/
+
+# System files
+Thumbs.db
+.DS_Store
+*.log
+
+# Optional editors
+.vscode/
