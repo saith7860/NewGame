@@ -4,6 +4,9 @@ namespace GameFrameWork
 {
     public class Player : GameObject
     {
+        private float fireCooldown = 0.25f; // seconds between shots
+        private float fireTimer = 0f;
+       
         public Player(Image Sprite,PointF startPos,float speed)
         {
             this.Sprite = Sprite;
@@ -27,6 +30,7 @@ namespace GameFrameWork
         /// Shows the Strategy pattern (movement behavior varies independently from Player class).
         public override void Update(GameTime gameTime)
         {
+            fireTimer += gameTime.DeltaTime;
             Movement?.Move(this, gameTime);
             base.Update(gameTime);
         }
@@ -38,8 +42,12 @@ namespace GameFrameWork
             base.Draw(g);
         }
         //bullet shoot
-        public Bullet Shoot()
+        public Bullet? Shoot()
         {
+            if (fireTimer < fireCooldown)
+                return null;
+
+            fireTimer = 0f;
             PointF bulletPos = new PointF(
          Position.X + Size.Width / 2 - 3,
          Position.Y
@@ -53,6 +61,7 @@ namespace GameFrameWork
             if (other is Enemy)
             { 
                 Lives --;
+                
                 ResetPosition();
                 if (Lives<=0)
                 {

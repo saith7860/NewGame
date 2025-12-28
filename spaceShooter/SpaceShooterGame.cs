@@ -1,4 +1,5 @@
-﻿using GameFrameWork;
+﻿using DocumentFormat.OpenXml.Drawing;
+using GameFrameWork;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,7 +26,8 @@ namespace spaceShooter
 
         // Reference to player
         Player player;
-
+        Enemy spaceEnemy;
+        Bullet? bullet;
         public SpaceShooterGame()
         {
             InitializeComponent();
@@ -38,15 +40,20 @@ namespace spaceShooter
 
         private void SpaceShooterGame_Load(object sender, EventArgs e)
         {
-            player = new Player(Properties.Resources.spacePlayer,new PointF(500,500),5);
+            player = new Player(Properties.Resources.spacePlayer,new PointF(500,500),2);
             player.Size = new SizeF(100, 100);
             player.Position = new PointF(
           (1000 - player.Size.Width) / 2, // center horizontally
     800 - player.Size.Height - 45    // bottom with 10px margin
 );
             gameObjects.Add(player);
-            Enemy spaceEnemy= new Enemy(Properties.Resources.spaceShooter,new PointF(100,150));
-            gameObjects.Add(spaceEnemy);
+            for(int i=0;i<10;i++)
+            {
+                Enemy enemy= new Enemy(Properties.Resources.spaceShooter,new PointF(100 + i * 120,120));
+                gameObjects.Add(enemy);
+            }   
+            //spaceEnemy = new Enemy(Properties.Resources.spaceShooter,new PointF(100,150));
+            //gameObjects.Add(spaceEnemy);
             gameTimer.Start();
 
         }
@@ -56,8 +63,9 @@ namespace spaceShooter
             GameTime gameTime = new GameTime(deltaTime);
             if (EZInput.Keyboard.IsKeyPressed(EZInput.Key.Space))
             {
-                Bullet bullet = player.Shoot();
-                gameObjects.Add(bullet);
+                 bullet = player.Shoot();
+                if (bullet != null)
+                    gameObjects.Add(bullet);
             }
 
             // 1️⃣ Update all game objects
@@ -73,24 +81,42 @@ namespace spaceShooter
             // 2️⃣ Collision handling (for now just player vs enemies/power-ups)
             foreach (var obj in gameObjects)
             {
-                if (obj != player && obj.Bounds.IntersectsWith(player.Bounds))
+              
+               if (obj != player && obj.Bounds.IntersectsWith(player.Bounds))
                 {
                     player.OnCollision(obj);
                 }
             }
             collisionSystem.Check(gameObjects);
             gameObjects = gameObjects.Where(o => o.IsActive).ToList();
-
+          
             // 3️⃣ Redraw the screen
             Invalidate();
 
         }
+        //show UI
+        private void DrawUI(Graphics g)
+        {
+            // Draw Lives
+            g.DrawString("Lives: " + player.Lives,
+                         new Font("Arial", 16, FontStyle.Bold),
+                         Brushes.White,
+                         new PointF(10, 10));
+
+            // Draw Score
+            g.DrawString("Score: " + player.Score,
+                         new Font("Arial", 16, FontStyle.Bold),
+                         Brushes.White,
+                         new PointF(10, 40));
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             foreach (var obj in gameObjects)
             {
                 obj.Draw(e.Graphics);
             }
+            DrawUI(e.Graphics);
         }
     }
 }

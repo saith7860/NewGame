@@ -10,7 +10,7 @@ namespace GameFrameWork
         {
             Owner=owner;
             Position = startPosition;
-            Size = new SizeF(6, 10);
+            Size = new SizeF(8, 13);
             Velocity = new PointF(0, -8);
         }
 
@@ -36,9 +36,14 @@ namespace GameFrameWork
         /// Keep collision reaction encapsulated in the object class.
         public override void OnCollision(GameObject other)
         {
-            if (other is Enemy)
-                IsActive = false;
-                
+            //if (other is Enemy)
+            //    IsActive = false;
+            if ( other is Enemy enemy && Owner is Player player)
+            {
+                enemy.IsActive = false;
+                player.AddScore(10);
+            }
+
         }
     }
 }

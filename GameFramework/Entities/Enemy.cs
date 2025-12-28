@@ -37,8 +37,10 @@ namespace GameFrameWork
         {
             if (other is Bullet)
                 IsActive = false;
+                
             if (other is Bullet && other is GameObject)
             {
+
             }
         }
     }

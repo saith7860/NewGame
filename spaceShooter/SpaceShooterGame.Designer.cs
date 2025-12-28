@@ -42,9 +42,9 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.LightGray;
+            BackColor = Color.Black;
             ClientSize = new Size(978, 744);
-            ForeColor = Color.LightGray;
+            ForeColor = Color.Black;
             MaximumSize = new Size(1000, 800);
             Name = "SpaceShooterGame";
             Text = "SpaceShooterGame";
