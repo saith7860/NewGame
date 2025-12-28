@@ -8,9 +8,12 @@ namespace GameFrameWork
         public IMovement? Movement { get; set; }
 
         // Default enemy velocity is set in constructor to give basic movement out-of-the-box.
-        public Enemy()
+        public Enemy(Image Sprite,PointF startPos)
         {
-            Velocity = new PointF(-2, 0);
+            this.Sprite = Sprite;
+            Position = startPos;
+            Velocity = new PointF(0, 1);
+            Size = new SizeF(40, 40);
         }
 
         /// Update will call movement behavior (if any) and then apply base update to move by velocity.
@@ -18,12 +21,15 @@ namespace GameFrameWork
         {
             Movement?.Move(this, gameTime); // movement must be called
             base.Update(gameTime);
+            if (Position.Y > 800)   // adjust to form height
+                IsActive = false;
         }
 
         /// Custom draw: demonstrates polymorphism (override base draw to provide enemy visuals).
         public override void Draw(Graphics g)
         {
-            g.FillRectangle(Brushes.Red, Bounds);
+            base.Draw(g);
+            //g.FillRectangle(Brushes.Red, Bounds);
         }
 
         /// On collision, enemy deactivates when hit by bullets (encapsulation of reaction logic inside the entity).
@@ -31,6 +37,9 @@ namespace GameFrameWork
         {
             if (other is Bullet)
                 IsActive = false;
+            if (other is Bullet && other is GameObject)
+            {
+            }
         }
     }
 }

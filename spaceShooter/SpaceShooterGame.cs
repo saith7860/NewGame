@@ -15,6 +15,7 @@ namespace spaceShooter
     {
         // List of all game objects
         List<GameObject> gameObjects = new List<GameObject>();
+        CollisionSystem collisionSystem = new CollisionSystem();
 
         // Game Timer (~60 FPS)
         System.Windows.Forms.Timer gameTimer = new System.Windows.Forms.Timer();
@@ -40,10 +41,12 @@ namespace spaceShooter
             player = new Player(Properties.Resources.spacePlayer,new PointF(500,500),5);
             player.Size = new SizeF(100, 100);
             player.Position = new PointF(
-    (1000 - player.Size.Width) / 2, // center horizontally
+          (1000 - player.Size.Width) / 2, // center horizontally
     800 - player.Size.Height - 45    // bottom with 10px margin
 );
             gameObjects.Add(player);
+            Enemy spaceEnemy= new Enemy(Properties.Resources.spaceShooter,new PointF(100,150));
+            gameObjects.Add(spaceEnemy);
             gameTimer.Start();
 
         }
@@ -75,6 +78,7 @@ namespace spaceShooter
                     player.OnCollision(obj);
                 }
             }
+            collisionSystem.Check(gameObjects);
             gameObjects = gameObjects.Where(o => o.IsActive).ToList();
 
             // 3️⃣ Redraw the screen

@@ -4,11 +4,13 @@ namespace GameFrameWork
 
     public class Bullet : GameObject
     {
+        public GameObject Owner { get; private set; }
         // Bullets set a default velocity in the constructor - a simple example of behavior initialization.
-        public Bullet(PointF startPosition)
+        public Bullet(GameObject owner,PointF startPosition)
         {
+            Owner=owner;
             Position = startPosition;
-            Size = new SizeF(6, 20);
+            Size = new SizeF(6, 10);
             Velocity = new PointF(0, -8);
         }
 
@@ -36,6 +38,7 @@ namespace GameFrameWork
         {
             if (other is Enemy)
                 IsActive = false;
+                
         }
     }
 }

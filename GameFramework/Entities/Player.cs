@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Numerics;
 namespace GameFrameWork
 {
     public class Player : GameObject
@@ -17,7 +18,11 @@ namespace GameFrameWork
         // Domain state
         public int Lives { get; set; } = 3;
         public int Score { get; set; } = 0;
-
+        //add score method
+        public void AddScore(int points)
+        {
+            Score += points;
+        }
         /// Update the player: delegate movement to the Movement strategy (if provided) and then apply base update.
         /// Shows the Strategy pattern (movement behavior varies independently from Player class).
         public override void Update(GameTime gameTime)
@@ -35,12 +40,12 @@ namespace GameFrameWork
         //bullet shoot
         public Bullet Shoot()
         {
-            return new Bullet(
-                new PointF(
-                    Position.X + Size.Width / 2 - 3,
-                    Position.Y
-                )
-            );
+            PointF bulletPos = new PointF(
+         Position.X + Size.Width / 2 - 3,
+         Position.Y
+     );
+
+            return new Bullet(this, bulletPos);
         }
         /// Collision reaction for the player. Demonstrates single responsibility: domain reaction is handled here.
         public override void OnCollision(GameObject other)
@@ -51,6 +56,7 @@ namespace GameFrameWork
                 ResetPosition();
                 if (Lives<=0)
                 {
+                    IsActive = false;   
                    //gameOver logic 
                 }
             }
@@ -61,7 +67,10 @@ namespace GameFrameWork
         }
         public void ResetPosition()
         {
-            this.Position=new PointF(0,0);
+            this.Position= new PointF(
+          (1000 - 100) / 2, // center horizontally
+    (800 - 100) - 45    // bottom with 10px margin
+);
         }
     }
 
