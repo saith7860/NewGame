@@ -21,6 +21,11 @@ namespace GameFrameWork
         // Domain state
         public int Lives { get; set; } = 3;
         public int Score { get; set; } = 0;
+        public int Level { get; set; } = 1;
+        public int enemiesDestroyed { get; set; } = 0;
+
+        public int enemiesToNextLevel { get; set; } = 10;
+
         //add score method
         public void AddScore(int points)
         {
@@ -61,12 +66,13 @@ namespace GameFrameWork
         {
             if (other is Enemy)
             {
+
                 if (Lives!=0)
                 {
                     Lives--;
                 }
                 
-                
+
                 ResetPosition();
                 if (Lives<=0)
                 {

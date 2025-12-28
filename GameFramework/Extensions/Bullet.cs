@@ -41,6 +41,13 @@ namespace GameFrameWork
             //    IsActive = false;
             if ( other is Enemy enemy && Owner is Player player)
             {
+                player.enemiesDestroyed++;
+
+                if (player.enemiesDestroyed >= player.enemiesToNextLevel)
+                {
+                    player.Level++;
+                    //player.enemiesDestroyed = 0; // RESET for next level
+                }
                 enemy.IsActive = false;
                 player.AddScore(10);
             }

@@ -18,7 +18,9 @@ namespace spaceShooter
         // List of all game objects
         List<GameObject> gameObjects = new List<GameObject>();
         CollisionSystem collisionSystem = new CollisionSystem();
-        Random rand;
+
+        bool levelJustStarted = true;
+        Random rand=new Random();
         // Game Timer (~60 FPS)
         System.Windows.Forms.Timer gameTimer = new System.Windows.Forms.Timer();
 
@@ -27,7 +29,7 @@ namespace spaceShooter
 
         // Reference to player
         Player player;
-        Enemy spaceEnemy;
+        //Enemy enemy;
         Bullet? bullet;
         public SpaceShooterGame()
         {
@@ -41,35 +43,54 @@ namespace spaceShooter
 
         private void SpaceShooterGame_Load(object sender, EventArgs e)
         {
-            player = new Player(Properties.Resources.spacePlayer,new PointF(500,500),2);
+            player = new Player(Properties.Resources.spacePlayer, new PointF(500, 500), 2);
             player.Size = new SizeF(100, 100);
             player.Position = new PointF(
           (1000 - player.Size.Width) / 2, // center horizontally
     800 - player.Size.Height - 45    // bottom with 10px margin
 );
             gameObjects.Add(player);
-            rand = new Random();
+
 
             for (int i = 0; i < 10; i++)
             {
-                Enemy enemy = new Enemy(
-                    Properties.Resources.spaceShooter,
-                    new PointF(rand.Next(0, ClientSize.Width - 40), -rand.Next(50, 400))
-                );
+               Enemy enemy = new Enemy(
+                   Properties.Resources.spaceShooter,
+                   new PointF(rand.Next(0, ClientSize.Width - 40), -rand.Next(50, 400))
+               );
 
                 enemy.Velocity = new PointF(0, rand.Next(2, 6)); // slow to fast
                 gameObjects.Add(enemy);
             }
-            //for(int i=0;i<10;i++)
-            //{
-            //    Enemy enemy= new Enemy(Properties.Resources.spaceShooter,new PointF(100 + i * 120,120));
-            //    gameObjects.Add(enemy);
-            //}   
-            //spaceEnemy = new Enemy(Properties.Resources.spaceShooter,new PointF(100,150));
-            //gameObjects.Add(spaceEnemy);
+
             gameTimer.Start();
 
         }
+        //game logic for level incrementation
+        private void SpawnEnemiesForLevel(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                Enemy enemy = new Enemy(
+                    Properties.Resources.spaceShooter,
+                    new PointF(
+                        rand.Next(0, ClientSize.Width - 40),
+                        -rand.Next(50, 400)
+                    )
+                );
+
+                int size = rand.Next(30, 80);
+                enemy.Size = new SizeF(size, size);
+
+                float speed = rand.Next(2 + player.Level, 6 + player.Level * 2);
+                enemy.Velocity = new PointF(0, speed);
+
+                gameObjects.Add(enemy);
+            }
+        }
+
+
+    
 
         private void gameLoopTimer_Tick(object sender, EventArgs e)
         {
@@ -78,10 +99,19 @@ namespace spaceShooter
                 if (EZInput.Keyboard.IsKeyPressed(EZInput.Key.Space))
             {
                  bullet = player.Shoot();
-                if (bullet != null)
+                 if (bullet != null)
                     gameObjects.Add(bullet);
             }
-            foreach(var obj in gameObjects.ToList())
+            if (player.enemiesDestroyed >= player.enemiesToNextLevel && levelJustStarted)
+            {
+               
+                player.enemiesDestroyed = 0;
+
+                SpawnEnemiesForLevel(10);
+
+                //levelJustStarted = false;
+            }
+            foreach (var obj in gameObjects.ToList())
             {
                 obj.Update(gameTime);
                 if (obj is Enemy enemy)
@@ -99,35 +129,38 @@ namespace spaceShooter
                     }
                 }
                 if (obj.Movements.Count > 0)
-                   obj.ApplyMovements(gameTime);
-            
-            }
-            // 1️⃣ Update all game objects
-            //foreach (var obj in gameObjects.ToList())
-            //{
-            //    if (obj is Enemy enemy)
-            //    {
-            //        enemy.Shoot();
-            //        if (bullet!=null)
-            //        {
-            //            gameObjects.Add(bullet);
-            //        }
-            //    }
-            //    obj.Update(gameTime);
+                    obj.ApplyMovements(gameTime);
+                // Keep player inside screen
+                if (player != null)
+                {
+                    float maxX = ClientSize.Width - player.Size.Width;
+                    float maxY = ClientSize.Height - player.Size.Height;
 
-            //    // Apply multiple movements if available
-            //    if (obj.Movements.Count > 0)
-            //        obj.ApplyMovements(gameTime);
-            //}
+                    float x = player.Position.X;
+                    float y = player.Position.Y;
+
+                    if (x < 0) x = 0;
+                    if (y < 0) y = 0;
+                    if (x > maxX) x = maxX;
+                    if (y > maxY) y = maxY;
+
+                    player.Position = new PointF(x, y);
+                }
+              
+            }
+            
 
             // 2️⃣ Collision handling (for now just player vs enemies/power-ups)
             foreach (var obj in gameObjects.ToList())
             {
+
               
                if (obj != player && obj.Bounds.IntersectsWith(player.Bounds))
                 {
                     player.OnCollision(obj);
                 }
+             
+
             }
             collisionSystem.Check(gameObjects);
 
@@ -153,8 +186,17 @@ namespace spaceShooter
                          new Font("Arial", 16, FontStyle.Bold),
                          Brushes.White,
                          new PointF(10, 40));
+            g.DrawString("Level: " + player.Level,
+    new Font("Arial", 16, FontStyle.Bold),
+    Brushes.White,
+    new PointF(10, 70));
+            g.DrawString("Level: " + player.enemiesDestroyed,
+new Font("Arial", 16, FontStyle.Bold),
+Brushes.White,
+new PointF(10, 110));
         }
 
+      
         protected override void OnPaint(PaintEventArgs e)
         {
             foreach (var obj in gameObjects.ToList())
