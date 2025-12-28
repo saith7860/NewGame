@@ -5,9 +5,11 @@ namespace GameFrameWork
     public class Bullet : GameObject
     {
         // Bullets set a default velocity in the constructor - a simple example of behavior initialization.
-        public Bullet()
+        public Bullet(PointF startPosition)
         {
-            Velocity = new PointF(8, 0);
+            Position = startPosition;
+            Size = new SizeF(6, 20);
+            Velocity = new PointF(0, -8);
         }
 
         /// Bullets use the default movement logic (base.Update) and deactivate when off-screen.
@@ -16,7 +18,7 @@ namespace GameFrameWork
         {
             base.Update(gameTime);
 
-            if (Position.X > 1000)
+            if (Position.Y + Size.Height < 0)
                 IsActive = false;
         }
 
