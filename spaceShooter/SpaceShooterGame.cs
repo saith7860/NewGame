@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Vml.Office;
 using GameFrameWork;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace spaceShooter
         // List of all game objects
         List<GameObject> gameObjects = new List<GameObject>();
         CollisionSystem collisionSystem = new CollisionSystem();
-
+        Random rand;
         // Game Timer (~60 FPS)
         System.Windows.Forms.Timer gameTimer = new System.Windows.Forms.Timer();
 
@@ -47,11 +48,23 @@ namespace spaceShooter
     800 - player.Size.Height - 45    // bottom with 10px margin
 );
             gameObjects.Add(player);
-            for(int i=0;i<10;i++)
+            rand = new Random();
+
+            for (int i = 0; i < 10; i++)
             {
-                Enemy enemy= new Enemy(Properties.Resources.spaceShooter,new PointF(100 + i * 120,120));
+                Enemy enemy = new Enemy(
+                    Properties.Resources.spaceShooter,
+                    new PointF(rand.Next(0, ClientSize.Width - 40), -rand.Next(50, 400))
+                );
+
+                enemy.Velocity = new PointF(0, rand.Next(2, 6)); // slow to fast
                 gameObjects.Add(enemy);
-            }   
+            }
+            //for(int i=0;i<10;i++)
+            //{
+            //    Enemy enemy= new Enemy(Properties.Resources.spaceShooter,new PointF(100 + i * 120,120));
+            //    gameObjects.Add(enemy);
+            //}   
             //spaceEnemy = new Enemy(Properties.Resources.spaceShooter,new PointF(100,150));
             //gameObjects.Add(spaceEnemy);
             gameTimer.Start();
@@ -60,26 +73,55 @@ namespace spaceShooter
 
         private void gameLoopTimer_Tick(object sender, EventArgs e)
         {
-            GameTime gameTime = new GameTime(deltaTime);
-            if (EZInput.Keyboard.IsKeyPressed(EZInput.Key.Space))
+                GameTime gameTime = new GameTime(deltaTime);
+          
+                if (EZInput.Keyboard.IsKeyPressed(EZInput.Key.Space))
             {
                  bullet = player.Shoot();
                 if (bullet != null)
                     gameObjects.Add(bullet);
             }
-
-            // 1️⃣ Update all game objects
-            foreach (var obj in gameObjects)
+            foreach(var obj in gameObjects.ToList())
             {
                 obj.Update(gameTime);
+                if (obj is Enemy enemy)
+                {
 
-                // Apply multiple movements if available
+
+                    if (enemy.Position.Y > ClientSize.Height)
+                    {
+                        enemy.Position = new PointF(
+                            rand.Next(0, (int)(ClientSize.Width - enemy.Size.Width)),
+                            -enemy.Size.Height
+                        );
+
+                        enemy.Velocity = new PointF(0, rand.Next(2, 6));
+                    }
+                }
                 if (obj.Movements.Count > 0)
-                    obj.ApplyMovements(gameTime);
+                   obj.ApplyMovements(gameTime);
+            
             }
+            // 1️⃣ Update all game objects
+            //foreach (var obj in gameObjects.ToList())
+            //{
+            //    if (obj is Enemy enemy)
+            //    {
+            //        enemy.Shoot();
+            //        if (bullet!=null)
+            //        {
+            //            gameObjects.Add(bullet);
+            //        }
+            //    }
+            //    obj.Update(gameTime);
+
+            //    // Apply multiple movements if available
+            //    if (obj.Movements.Count > 0)
+            //        obj.ApplyMovements(gameTime);
+            //}
 
             // 2️⃣ Collision handling (for now just player vs enemies/power-ups)
-            foreach (var obj in gameObjects)
+            foreach (var obj in gameObjects.ToList())
             {
               
                if (obj != player && obj.Bounds.IntersectsWith(player.Bounds))
@@ -88,8 +130,11 @@ namespace spaceShooter
                 }
             }
             collisionSystem.Check(gameObjects);
+
             gameObjects = gameObjects.Where(o => o.IsActive).ToList();
-          
+
+
+
             // 3️⃣ Redraw the screen
             Invalidate();
 
@@ -112,7 +157,7 @@ namespace spaceShooter
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            foreach (var obj in gameObjects)
+            foreach (var obj in gameObjects.ToList())
             {
                 obj.Draw(e.Graphics);
             }

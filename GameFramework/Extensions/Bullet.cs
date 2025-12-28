@@ -6,12 +6,13 @@ namespace GameFrameWork
     {
         public GameObject Owner { get; private set; }
         // Bullets set a default velocity in the constructor - a simple example of behavior initialization.
-        public Bullet(GameObject owner,PointF startPosition)
+        public Bullet(GameObject owner,PointF startPosition,PointF velocity)
         {
             Owner=owner;
             Position = startPosition;
             Size = new SizeF(8, 13);
-            Velocity = new PointF(0, -8);
+            Velocity = velocity;
+            IsActive = true;
         }
 
         /// Bullets use the default movement logic (base.Update) and deactivate when off-screen.

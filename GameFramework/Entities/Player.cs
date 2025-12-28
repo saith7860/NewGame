@@ -44,6 +44,7 @@ namespace GameFrameWork
         //bullet shoot
         public Bullet? Shoot()
         {
+
             if (fireTimer < fireCooldown)
                 return null;
 
@@ -53,14 +54,18 @@ namespace GameFrameWork
          Position.Y
      );
 
-            return new Bullet(this, bulletPos);
+            return new Bullet(this, bulletPos,new PointF(0,-8));
         }
         /// Collision reaction for the player. Demonstrates single responsibility: domain reaction is handled here.
         public override void OnCollision(GameObject other)
         {
             if (other is Enemy)
-            { 
-                Lives --;
+            {
+                if (Lives!=0)
+                {
+                    Lives--;
+                }
+                
                 
                 ResetPosition();
                 if (Lives<=0)

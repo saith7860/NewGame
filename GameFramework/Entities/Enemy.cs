@@ -4,6 +4,8 @@ namespace GameFrameWork
 
     public class Enemy : GameObject
     {
+        private float fireCooldown = 0.25f; // seconds between shots
+        private float fireTimer = 0f;
         // Optional movement behavior: demonstrates composition and allows testable movement logic.
         public IMovement? Movement { get; set; }
 
@@ -21,8 +23,16 @@ namespace GameFrameWork
         {
             Movement?.Move(this, gameTime); // movement must be called
             base.Update(gameTime);
-            if (Position.Y > 800)   // adjust to form height
-                IsActive = false;
+            //if (Position.Y > 800)   // adjust to form height
+            //IsActive= false;
+            //Random rand = new Random();
+
+            //Position = new PointF(
+            //    rand.Next(0, 1000 - (int)Size.Width), // random X
+            //    -Size.Height                          // above screen
+            //);
+
+            //Velocity = new PointF(0, rand.Next(50, 200));
         }
 
         /// Custom draw: demonstrates polymorphism (override base draw to provide enemy visuals).
@@ -31,6 +41,7 @@ namespace GameFrameWork
             base.Draw(g);
             //g.FillRectangle(Brushes.Red, Bounds);
         }
+        //enemy shoot method
 
         /// On collision, enemy deactivates when hit by bullets (encapsulation of reaction logic inside the entity).
         public override void OnCollision(GameObject other)
