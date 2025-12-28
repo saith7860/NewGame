@@ -51,6 +51,11 @@ namespace spaceShooter
         private void gameLoopTimer_Tick(object sender, EventArgs e)
         {
             GameTime gameTime = new GameTime(deltaTime);
+            if (EZInput.Keyboard.IsKeyPressed(EZInput.Key.Space))
+            {
+                Bullet bullet = player.Shoot();
+                gameObjects.Add(bullet);
+            }
 
             // 1️⃣ Update all game objects
             foreach (var obj in gameObjects)
@@ -70,6 +75,7 @@ namespace spaceShooter
                     player.OnCollision(obj);
                 }
             }
+            gameObjects = gameObjects.Where(o => o.IsActive).ToList();
 
             // 3️⃣ Redraw the screen
             Invalidate();

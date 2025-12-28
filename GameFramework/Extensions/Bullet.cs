@@ -25,8 +25,10 @@ namespace GameFrameWork
         /// Simple visual representation for bullets (polymorphism example).
         public override void Draw(Graphics g)
         {
-            g.FillRectangle(Brushes.Yellow, Bounds);
+            g.FillRectangle(Brushes.Red, Bounds);
         }
+      
+
 
         /// On collision bullets deactivate when hitting an enemy.
         /// Keep collision reaction encapsulated in the object class.

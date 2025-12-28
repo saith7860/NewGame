@@ -32,7 +32,16 @@ namespace GameFrameWork
         {
             base.Draw(g);
         }
-
+        //bullet shoot
+        public Bullet Shoot()
+        {
+            return new Bullet(
+                new PointF(
+                    Position.X + Size.Width / 2 - 3,
+                    Position.Y
+                )
+            );
+        }
         /// Collision reaction for the player. Demonstrates single responsibility: domain reaction is handled here.
         public override void OnCollision(GameObject other)
         {
