@@ -1,6 +1,8 @@
 ﻿using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Vml.Office;
+using GameFramework.Core;
 using GameFrameWork;
+using NAudio.SoundFont;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,9 +17,20 @@ namespace spaceShooter
 {
     public partial class SpaceShooterGame : Form
     {
+        class Star
+        {
+            public PointF Position;
+            public float Speed;
+            public int Size;
+        }
+
         // List of all game objects
         List<GameObject> gameObjects = new List<GameObject>();
+        List<Star> stars = new List<Star>();
+
         CollisionSystem collisionSystem = new CollisionSystem();
+        GameState currentState = GameState.StartMenu;
+        RectangleF startButtonRect = new RectangleF(300, 300, 250, 50);
 
         bool levelJustStarted = true;
         Random rand=new Random();
@@ -51,6 +64,18 @@ namespace spaceShooter
 );
             gameObjects.Add(player);
 
+            for (int i = 0; i < 100; i++)
+            {
+                stars.Add(new Star
+                {
+                    Position = new PointF(
+                        rand.Next(0, ClientSize.Width),
+                        rand.Next(0, ClientSize.Height)
+                    ),
+                    Speed = rand.Next(1, 4),
+                    Size = rand.Next(1, 3)
+                });
+            }
 
             for (int i = 0; i < 10; i++)
             {
@@ -62,7 +87,7 @@ namespace spaceShooter
                 enemy.Velocity = new PointF(0, rand.Next(2, 6)); // slow to fast
                 gameObjects.Add(enemy);
             }
-
+          
             gameTimer.Start();
 
         }
@@ -94,8 +119,41 @@ namespace spaceShooter
 
         private void gameLoopTimer_Tick(object sender, EventArgs e)
         {
-                GameTime gameTime = new GameTime(deltaTime);
-          
+            foreach (var star in stars)
+            {
+                star.Position = new PointF(
+                    star.Position.X,
+                    star.Position.Y + star.Speed
+                );
+
+                if (star.Position.Y > ClientSize.Height)
+                {
+                    star.Position = new PointF(
+                        rand.Next(0, ClientSize.Width),
+                        0
+                    );
+                }
+            }
+
+            if (currentState == GameState.StartMenu)
+            {
+                if (EZInput.Keyboard.IsKeyPressed(EZInput.Key.Enter))
+                {
+                    currentState = GameState.Playing;
+                }
+
+                Invalidate();
+                return;
+            }
+            if (currentState != GameState.Playing)
+            {
+                Invalidate();
+                return;
+            }
+           
+
+            GameTime gameTime = new GameTime(deltaTime);
+            
                 if (EZInput.Keyboard.IsKeyPressed(EZInput.Key.Space))
             {
                  bullet = player.Shoot();
@@ -172,6 +230,18 @@ namespace spaceShooter
             Invalidate();
 
         }
+        //mouse click event
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            if (currentState == GameState.StartMenu)
+            {
+                if (startButtonRect.Contains(e.Location))
+                {
+                    currentState = GameState.Playing;
+                }
+            }
+        }
+
         //show UI
         private void DrawUI(Graphics g)
         {
@@ -190,20 +260,77 @@ namespace spaceShooter
     new Font("Arial", 16, FontStyle.Bold),
     Brushes.White,
     new PointF(10, 70));
-            g.DrawString("Level: " + player.enemiesDestroyed,
-new Font("Arial", 16, FontStyle.Bold),
-Brushes.White,
-new PointF(10, 110));
+
+        }
+        private void DrawStartScreen(Graphics g)
+        {
+            g.Clear(Color.Black);
+            g.DrawString("SPACE SHOOTER",
+                new Font("Arial", 36, FontStyle.Bold),
+                Brushes.White,
+                new PointF(170, 200));
+            //start button
+            g.FillRectangle(Brushes.DarkBlue, startButtonRect);
+            g.DrawRectangle(Pens.White, startButtonRect);
+
+            g.DrawString("START",
+                new Font("Arial", 24, FontStyle.Bold),
+                Brushes.White,
+                new PointF(startButtonRect.X + 40, startButtonRect.Y + 2));
         }
 
-      
+        private void DrawLevelCompleteScreen(Graphics g)
+        {
+            g.Clear(Color.Black);
+            g.DrawString("LEVEL COMPLETE!",
+                new Font("Arial", 36, FontStyle.Bold),
+                Brushes.Yellow,
+                new PointF(220, 250));
+        }
+        //draw stars
+        private void DrawStars(Graphics g)
+        {
+            foreach (var star in stars)
+            {
+                g.FillEllipse(
+                    Brushes.White,
+                    star.Position.X,
+                    star.Position.Y,
+                    star.Size,
+                    star.Size
+                );
+            }
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
-            foreach (var obj in gameObjects.ToList())
+            DrawStars(e.Graphics);
+            switch (currentState)
             {
-                obj.Draw(e.Graphics);
+                case GameState.StartMenu:
+                    DrawStartScreen(e.Graphics);
+                    break;
+
+                case GameState.Playing:
+                    foreach (var obj in gameObjects)
+                        obj.Draw(e.Graphics);
+
+                    DrawUI(e.Graphics);
+                    break;
+
+                case GameState.LevelComplete:
+                    DrawLevelCompleteScreen(e.Graphics);
+                    break;
             }
-            DrawUI(e.Graphics);
         }
+
+        //protected override void OnPaint(PaintEventArgs e)
+        //{
+        //    foreach (var obj in gameObjects.ToList())
+        //    {
+        //        obj.Draw(e.Graphics);
+        //    }
+        //    DrawUI(e.Graphics);
+        //}
     }
 }
