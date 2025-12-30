@@ -128,5 +128,14 @@ namespace spaceShooter.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream war_never_changes_epic_dubstep_283163 {
+            get {
+                return ResourceManager.GetStream("war-never-changes-epic-dubstep-283163", resourceCulture);
+            }
+        }
     }
 }

@@ -60,10 +60,19 @@ namespace GameFramework.Component
                     reader.Position = 0;
                     output.Play();
                 };
+                readers[name] = reader;
+                outputs[name] = output;
             }
-
-            readers[name] = reader;
-            outputs[name] = output;
+            else if(!sound.Loop)
+            {
+               
+                output.PlaybackStopped += (s, e) =>
+                {
+                    output.Dispose();
+                    reader.Dispose();
+                };
+            }
+          
 
             output.Play();
         }

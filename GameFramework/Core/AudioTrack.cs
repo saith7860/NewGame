@@ -13,13 +13,13 @@ namespace GameFramework.Core
         public float Volume { get; set; }
         public bool Loop { get; set; } 
         public float Duration { get; set; }
-        public AudioTrack(string name, string filePath,bool loop)
+        public AudioTrack(string name, string filePath,bool loop,float volume)
         {
             Name = name;
             FilePath = filePath;
-            Volume = 1f;
+            Volume= volume;
             Loop = loop;
-            Duration = 1f;
+            //Duration = 1f;
         }
     }
 }

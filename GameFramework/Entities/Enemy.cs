@@ -10,6 +10,9 @@ namespace GameFrameWork
         public IMovement? Movement { get; set; }
 
         // Default enemy velocity is set in constructor to give basic movement out-of-the-box.
+        public event Action? OnDestroyed;
+        public bool isDestroyed {  get; set; }=false;
+
         public Enemy(Image Sprite,PointF startPos)
         {
             this.Sprite = Sprite;
@@ -48,7 +51,8 @@ namespace GameFrameWork
         {
             if (other is Bullet)
                 IsActive = false;
-                
+            isDestroyed = true;
+            OnDestroyed?.Invoke();
             if (other is Bullet && other is GameObject)
             {
 
