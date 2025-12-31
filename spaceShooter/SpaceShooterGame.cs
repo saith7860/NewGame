@@ -28,7 +28,9 @@ namespace spaceShooter
         CollisionSystem collisionSystem = new();
         GameState currentState = GameState.StartMenu;
 
-        RectangleF startButtonRect = new(300, 300, 250, 50);
+        RectangleF startButtonRect = new(370, 300, 250, 50);
+        RectangleF exitButton=new (370,400,250,50); 
+        RectangleF instructions=new(370,500,250,50);
         RectangleF nextLevelButtonRect = new(350, 350, 300, 60);
 
         Random rand = new();
@@ -228,15 +230,40 @@ namespace spaceShooter
             if (player.enemiesDestroyed >= player.enemiesToNextLevel)
                 currentState = GameState.LevelComplete;
         }
-
+        // =================== INSTRUCTIONS ===================
+        private void showInstructions()
+        {
+            string instructionsText = "SPACE SHOOTER GAME GUIDE\n\n" +
+                "Objective:\n" +
+                "- Destroy enemies to score points and advance levels.\n\n" +
+                "Controls:\n" +
+                "- Arrow Keys: Move your spaceship.\n" +
+                "- Spacebar: Shoot bullets.\n\n" +
+                "Gameplay:\n" +
+                "- Avoid enemy collisions to preserve lives.\n" +
+                "- Destroy a set number of enemies to complete levels.\n\n" +
+                "Good luck, Commander!";
+            MessageBox.Show(instructionsText, "Game Instructions", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
         // =================== MOUSE ===================
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            if (currentState == GameState.StartMenu &&
-                startButtonRect.Contains(e.Location))
+            if (currentState == GameState.StartMenu)
             {
-                currentState = GameState.Playing;
+                if (startButtonRect.Contains(e.Location))
+                {
+                    currentState = GameState.Playing;
+                }
+                else if (exitButton.Contains(e.Location))
+                {
+                    Application.Exit();
+                }
+                else if (instructions.Contains(e.Location))
+                {
+                    showInstructions();
+                }
             }
+           
             else if (currentState == GameState.LevelComplete &&
                      nextLevelButtonRect.Contains(e.Location))
             {
@@ -285,13 +312,22 @@ namespace spaceShooter
 
         private void DrawStartScreen(Graphics g)
         {
-            g.Clear(Color.Black);
+            //g.Clear(Color.Black);
+            g.DrawImage(Properties.Resources.startBackground1, 0, 0, ClientSize.Width, ClientSize.Height);
             g.DrawString("SPACE SHOOTER", new Font("Arial", 36, FontStyle.Bold), Brushes.White, 170, 200);
 
             g.FillRectangle(Brushes.DarkBlue, startButtonRect);
             g.DrawRectangle(Pens.White, startButtonRect);
             g.DrawString("START", new Font("Arial", 24, FontStyle.Bold),
-                Brushes.White, startButtonRect.X + 40, startButtonRect.Y + 5);
+                Brushes.White, startButtonRect.X + 40, startButtonRect.Y + 2);
+            g.FillRectangle(Brushes.DarkBlue, exitButton);
+            g.DrawRectangle(Pens.White, exitButton);
+            g.DrawString("EXIT", new Font("Arial", 24, FontStyle.Bold),
+            Brushes.White, exitButton.X + 50, exitButton.Y + 2);
+            g.FillRectangle(Brushes.DarkBlue, instructions);
+            g.DrawRectangle(Pens.White, instructions);
+            g.DrawString("GUIDE", new Font("Arial", 24, FontStyle.Bold),
+            Brushes.White, instructions.X + 30, instructions.Y + 2);
         }
 
         private void DrawLevelCompleteScreen(Graphics g)

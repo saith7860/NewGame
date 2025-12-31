@@ -142,4 +142,10 @@
   <data name="war-never-changes-epic-dubstep-283163" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\war-never-changes-epic-dubstep-283163.mp3;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="startBackground" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\startBackground.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="startBackground1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\startBackground1.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
