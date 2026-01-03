@@ -13,7 +13,7 @@ using System.Windows.Forms;
 namespace spaceShooter
 {
     public partial class SpaceShooterGame : Form
-    {
+    { 
         class Star
         {
             public PointF Position;
@@ -29,9 +29,11 @@ namespace spaceShooter
         GameState currentState = GameState.StartMenu;
 
         RectangleF startButtonRect = new(370, 300, 250, 50);
-        RectangleF exitButton=new (370,400,250,50); 
-        RectangleF instructions=new(370,500,250,50);
+        RectangleF exitButton = new(370, 400, 250, 50);
+        RectangleF instructions = new(370, 500, 250, 50);
         RectangleF nextLevelButtonRect = new(350, 350, 300, 60);
+        RectangleF restartButtonRect = new(350, 400, 300, 60);
+        RectangleF gameOverExitButtonRect = new(350, 480, 300, 60);
 
         Random rand = new();
         System.Windows.Forms.Timer gameTimer = new();
@@ -52,9 +54,9 @@ namespace spaceShooter
         // =================== Register Sounds ===============
         private void RegisterSounds()
         {
-            AudioTrack bgMusic = new AudioTrack("bg", @"Assets\backMusic.mp3",true,0.5f);
+            AudioTrack bgMusic = new AudioTrack("bg", @"Assets\backMusic.mp3", true, 0.5f);
             audio.AddSound(bgMusic);
-            AudioTrack shootSound = new AudioTrack("hit", @"Assets\hit.mp3", false, 1f);
+            AudioTrack shootSound = new AudioTrack("hit", @"Assets\hit.mp3", false, 0.8f);
             audio.AddSound(shootSound);
         }
 
@@ -66,7 +68,8 @@ namespace spaceShooter
             InitializeStars();
             SpawnEnemiesForLevel(10);
             RegisterSounds();
-            audio.PlaySound("bg");  
+            audio.PlaySound("bg");
+          
             gameTimer.Interval = 16;
             gameTimer.Tick += gameLoopTimer_Tick;
 
@@ -90,9 +93,13 @@ namespace spaceShooter
             UpdateGameObjects(gameTime);
             KeepPlayerInsideScreen();
             HandleCollisions();
+            if (player.Lives <= 0)
+            {
+                currentState = GameState.GameOver;
+            }
             CleanupObjects();
             CheckLevelCompletion();
-          
+
 
             Invalidate();
         }
@@ -140,17 +147,17 @@ namespace spaceShooter
         {
             for (int i = 0; i < count; i++)
             {
-                 enemy = new(
-                    Properties.Resources.spaceShooter,
-                    new PointF(rand.Next(0, ClientSize.Width - 40), -rand.Next(50, 400))
-                );
+                enemy = new(
+                   Properties.Resources.spaceShooter,
+                   new PointF(rand.Next(0, ClientSize.Width - 40), -rand.Next(50, 400))
+               );
 
                 int size = rand.Next(30, 80);
                 enemy.Size = new(size, size);
                 enemy.Velocity = new(0, rand.Next(2 + player.Level, 6 + player.Level * 2));
                 enemy.OnDestroyed += () =>
                 {
-                    //audio.PlaySound("hit");
+                    audio.PlaySound("hit");
                 };
                 gameObjects.Add(enemy);
             }
@@ -170,12 +177,12 @@ namespace spaceShooter
         {
             if (EZInput.Keyboard.IsKeyPressed(EZInput.Key.Space))
             {
-                
+
                 bullet = player.Shoot();
-               
+
                 if (bullet != null)
                     gameObjects.Add(bullet);
-                   
+
             }
         }
 
@@ -213,6 +220,7 @@ namespace spaceShooter
             {
                 if (obj != player && obj.Bounds.IntersectsWith(player.Bounds))
                     player.OnCollision(obj);
+
             }
 
             collisionSystem.Check(gameObjects);
@@ -228,7 +236,8 @@ namespace spaceShooter
         private void CheckLevelCompletion()
         {
             if (player.enemiesDestroyed >= player.enemiesToNextLevel)
-                currentState = GameState.LevelComplete;
+              
+            currentState = GameState.LevelComplete;
         }
         // =================== INSTRUCTIONS ===================
         private void showInstructions()
@@ -263,7 +272,7 @@ namespace spaceShooter
                     showInstructions();
                 }
             }
-           
+
             else if (currentState == GameState.LevelComplete &&
                      nextLevelButtonRect.Contains(e.Location))
             {
@@ -272,8 +281,27 @@ namespace spaceShooter
                 SpawnEnemiesForLevel(10);
                 currentState = GameState.Playing;
             }
+            else if (currentState == GameState.GameOver)
+            {
+                if (restartButtonRect.Contains(e.Location))
+                {
+                    // Reset game state
+                    player.Lives = 3;
+                    player.Score = 0;
+                    player.Level = 1;
+                    player.enemiesDestroyed = 0;
+                    gameObjects.Clear();
+                    InitializePlayer();
+                    SpawnEnemiesForLevel(10);
+                    currentState = GameState.Playing;
+                }
+                else if (gameOverExitButtonRect.Contains(e.Location))
+                {
+                    Application.Exit();
+                }
+            }
         }
-
+     
         // =================== DRAW ===================
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -294,6 +322,10 @@ namespace spaceShooter
                 case GameState.LevelComplete:
                     DrawLevelCompleteScreen(e.Graphics);
                     break;
+                case GameState.GameOver:
+                    DrawGameOverScreen(e.Graphics);
+                    break;
+
             }
         }
 
@@ -343,5 +375,38 @@ namespace spaceShooter
             g.DrawString("NEXT LEVEL", new Font("Arial", 22, FontStyle.Bold),
                 Brushes.White, nextLevelButtonRect.X + 20, nextLevelButtonRect.Y + 15);
         }
+        private void DrawGameOverScreen(Graphics g)
+        {
+            g.Clear(Color.Black);
+
+            g.DrawString("GAME OVER",
+                new Font("Arial", 42, FontStyle.Bold),
+                Brushes.Red,
+                250, 200);
+
+            g.DrawString($"Final Score: {player.Score}",
+                new Font("Arial", 22, FontStyle.Bold),
+                Brushes.White,
+                330, 290);
+
+            // Restart Button
+            g.FillRectangle(Brushes.DarkGreen, restartButtonRect);
+            g.DrawRectangle(Pens.White, restartButtonRect);
+            g.DrawString("START AGAIN",
+                new Font("Arial", 20, FontStyle.Bold),
+                Brushes.White,
+                restartButtonRect.X + 15,
+                restartButtonRect.Y + 15);
+
+            // Exit Button
+            g.FillRectangle(Brushes.DarkRed, gameOverExitButtonRect);
+            g.DrawRectangle(Pens.White, gameOverExitButtonRect);
+            g.DrawString("EXIT",
+                new Font("Arial", 20, FontStyle.Bold),
+                Brushes.White,
+                gameOverExitButtonRect.X + 90,
+                gameOverExitButtonRect.Y + 15);
+        }
+
     }
 }

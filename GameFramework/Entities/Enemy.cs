@@ -26,16 +26,6 @@ namespace GameFrameWork
         {
             Movement?.Move(this, gameTime); // movement must be called
             base.Update(gameTime);
-            //if (Position.Y > 800)   // adjust to form height
-            //IsActive= false;
-            //Random rand = new Random();
-
-            //Position = new PointF(
-            //    rand.Next(0, 1000 - (int)Size.Width), // random X
-            //    -Size.Height                          // above screen
-            //);
-
-            //Velocity = new PointF(0, rand.Next(50, 200));
         }
 
         /// Custom draw: demonstrates polymorphism (override base draw to provide enemy visuals).
@@ -44,15 +34,23 @@ namespace GameFrameWork
             base.Draw(g);
             //g.FillRectangle(Brushes.Red, Bounds);
         }
-        //enemy shoot method
+        public void Destroy()
+        {
+            if (!IsActive) return;
+
+            IsActive = false;
+            OnDestroyed?.Invoke();
+        }
+
 
         /// On collision, enemy deactivates when hit by bullets (encapsulation of reaction logic inside the entity).
         public override void OnCollision(GameObject other)
         {
             if (other is Bullet)
-                IsActive = false;
-            isDestroyed = true;
-            OnDestroyed?.Invoke();
+            {
+                //IsActive = false;
+                Destroy();
+            }
             if (other is Bullet && other is GameObject)
             {
 
